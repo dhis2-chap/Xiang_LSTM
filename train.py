@@ -7,7 +7,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 
-def fill_disease_data(df: pd.DataFrame) -> pd.DataFrame:
+def fill_disease_data(df: pd.DataFrame, ) -> pd.DataFrame:
     """
     Fill NaN values in disease case data by:
     1. Forward filling,
@@ -34,13 +34,13 @@ def get_df_per_location(csv_fn: str) -> dict:
     locations = {location: full_df[full_df['location'] == location] for location in unique_locations_list}
     return locations
 
-def train(csv_fn, model_fn):
+def train(csv_fn, model_fn, num_units = 4, num_epochs = 10, window_size = 0.66):
     models = {}
     locations = get_df_per_location(csv_fn)
 
     for location, data in locations.items():
         data = fill_disease_data(data)
-        window_size = min(313, int(len(data) / 1.5)) #SPØR GK
+        window_size = min(313, int(len(data) * window_size))
 
         scaler = MinMaxScaler(feature_range=(0, 1))
         scaled_data = scaler.fit_transform(data['disease_cases'].values.reshape(-1, 1))
@@ -50,13 +50,13 @@ def train(csv_fn, model_fn):
 
         # Define LSTM model
         model = Sequential([
-            LSTM(4, activation='relu', input_shape=(window_size, 1)),
+            LSTM(num_units, activation='relu', input_shape=(window_size, 1)),
             Dense(1)
         ])
         model.compile(optimizer='adam', loss='mean_squared_error')
 
         # Fit the LSTM model
-        model.fit(X, y, epochs=10, verbose=1)
+        model.fit(X, y, epochs=num_epochs, verbose=1)
 
         models[location] = model
 
