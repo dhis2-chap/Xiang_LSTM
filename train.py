@@ -40,7 +40,7 @@ def train(csv_fn, model_fn, num_units = 4, num_epochs = 10, window_size = 0.66):
 
     for location, data in locations.items():
         data = fill_disease_data(data)
-        window_size = min(313, int(len(data) * window_size))
+        window_size = int(len(data) * window_size)
 
         scaler = MinMaxScaler(feature_range=(0, 1))
         scaled_data = scaler.fit_transform(data['disease_cases'].values.reshape(-1, 1))
