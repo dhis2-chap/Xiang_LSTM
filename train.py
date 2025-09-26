@@ -34,7 +34,7 @@ def get_df_per_location(csv_fn: str) -> dict:
     locations = {location: full_df[full_df['location'] == location] for location in unique_locations_list}
     return locations
 
-def train(csv_fn, model_fn, num_units = 4, num_epochs = 10, window_size = 0.66):
+def train(csv_fn, model_fn, num_units = 4, num_epochs = 10, window_size = 0.5):
     models = {}
     locations = get_df_per_location(csv_fn)
 
