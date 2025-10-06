@@ -34,13 +34,13 @@ def get_df_per_location(csv_fn: str) -> dict:
     locations = {location: full_df[full_df['location'] == location] for location in unique_locations_list}
     return locations
 
-def train(csv_fn, model_fn, num_units = 4, num_epochs = 10, window_size = 0.5):
+def train(csv_fn, model_fn, num_units = 4, num_epochs = 10, window_ratio = 0.5):
     models = {}
     locations = get_df_per_location(csv_fn)
 
     for location, data in locations.items():
         data = fill_disease_data(data)
-        window_size = int(len(data) * window_size)
+        window_size = int(len(data) * window_ratio)
 
         scaler = MinMaxScaler(feature_range=(0, 1))
         scaled_data = scaler.fit_transform(data['disease_cases'].values.reshape(-1, 1))
