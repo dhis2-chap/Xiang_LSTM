@@ -7,7 +7,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 
-def fill_disease_data(df: pd.DataFrame, ) -> pd.DataFrame:
+def fill_disease_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Fill NaN values in disease case data by:
     1. Forward filling,
@@ -34,13 +34,15 @@ def get_df_per_location(csv_fn: str) -> dict:
     locations = {location: full_df[full_df['location'] == location] for location in unique_locations_list}
     return locations
 
-def train(csv_fn, model_fn, num_units = 4, num_epochs = 10, window_size = 0.5):
+def train(csv_fn, model_fn, model_config):
     models = {}
     locations = get_df_per_location(csv_fn)
+    num_units = 1
+    num_epochs = 1
 
     for location, data in locations.items():
         data = fill_disease_data(data)
-        window_size = int(len(data) * window_size)
+        window_size = int(len(data) * 0.5)
 
         scaler = MinMaxScaler(feature_range=(0, 1))
         scaled_data = scaler.fit_transform(data['disease_cases'].values.reshape(-1, 1))

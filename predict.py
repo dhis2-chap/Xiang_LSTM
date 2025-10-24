@@ -23,8 +23,8 @@ def get_df_per_location(csv_fn: str) -> dict:
     locations = {location: full_df[full_df['location'] == location] for location in unique_locations_list}
     return locations
 
-def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn):
-    number_of_weeks_pred = 3
+def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn, model_config):
+    number_of_weeks_pred = 6
     models = joblib.load(model_fn)
 
     locations_future = get_df_per_location(future_climatedata_fn)

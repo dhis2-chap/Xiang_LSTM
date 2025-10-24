@@ -2,17 +2,35 @@ name: min_py_template
 
 python_env: pyenv.yaml
 
+user_options:
+  number_of_units:
+    default: 4
+    title: Number of units
+    type: integer
+  num_epochs:
+    default: 10
+    title: Number of epochs
+    type: integer
+  lookback_fraction:
+    default: 0.5
+    title: Lookback fraction
+    type: number
+
+
+
 
 entry_points:
   train:
+    command: python train.py {train_data} {model} {model_config}
     parameters:
       train_data: str
       model: str
-    command: "python train.py {train_data} {model}"
+      model_config: str
   predict:
+    command: python predict.py {model} {historic_data} {future_data} {out_file} {model_config}
     parameters:
       historic_data: str
       future_data: str
       model: str
       out_file: str
-    command: "python predict.py {model} {historic_data} {future_data} {out_file}"
+      model_config: str
