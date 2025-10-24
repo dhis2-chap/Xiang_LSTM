@@ -6,8 +6,9 @@ import joblib
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
+import yaml
 
-def fill_disease_data(df: pd.DataFrame, ) -> pd.DataFrame:
+def fill_disease_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Fill NaN values in disease case data by:
     1. Forward filling,
@@ -34,13 +35,22 @@ def get_df_per_location(csv_fn: str) -> dict:
     locations = {location: full_df[full_df['location'] == location] for location in unique_locations_list}
     return locations
 
-def train(csv_fn, model_fn, num_units = 4, num_epochs = 10, window_ratio = 0.5):
+def train(csv_fn, model_fn, model_config):
     models = {}
     locations = get_df_per_location(csv_fn)
 
+    with open(model_config, "r") as f:
+        config = yaml.safe_load(f)
+
+    user_options = config['user_option_values']
+
+    num_units = user_options["number_of_units"]
+    num_epochs = user_options["num_epochs"]
+    lookback_fraction = user_options["lookback_fraction"]
+
     for location, data in locations.items():
         data = fill_disease_data(data)
-        window_size = int(len(data) * window_ratio)
+        window_size = int(len(data) * lookback_fraction)
 
         scaler = MinMaxScaler(feature_range=(0, 1))
         scaled_data = scaler.fit_transform(data['disease_cases'].values.reshape(-1, 1))
@@ -72,7 +82,8 @@ if __name__ == "__main__":
 
     parser.add_argument('csv_fn', type=str, help='Path to the CSV file containing input data.')
     parser.add_argument('model_fn', type=str, help='Path to save the trained model.')
+    parser.add_argument('model_config', type=str, help='Model_configurations')
     args = parser.parse_args()
-    train(args.csv_fn, args.model_fn)
+    train(args.csv_fn, args.model_fn, args.model_config)
 
 

@@ -6,6 +6,7 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
+import yaml
 
 
 def fill_disease_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -23,12 +24,18 @@ def get_df_per_location(csv_fn: str) -> dict:
     locations = {location: full_df[full_df['location'] == location] for location in unique_locations_list}
     return locations
 
-def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn):
+def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn, model_config):
     number_of_weeks_pred = 6
     models = joblib.load(model_fn)
 
     locations_future = get_df_per_location(future_climatedata_fn)
     locations_historic = get_df_per_location(historic_data_fn)
+
+    with open(model_config, "r") as f:
+        config = yaml.safe_load(f)
+
+    user_options = config['user_option_values']
+    lookback_fraction = user_options["lookback_fraction"]
 
     first_location = True
 
@@ -42,7 +49,7 @@ def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn):
         scaler = MinMaxScaler(feature_range=(0, 1))
         scaled_data = scaler.fit_transform(data['disease_cases'].values.reshape(-1, 1))
 
-        window_size = min(313, int(len(data) / 1.5))
+        window_size = int(len(data) * lookback_fraction)
         #print("Window_size: ", window_size)
 
         X = scaled_data[-window_size:].flatten()
@@ -73,6 +80,6 @@ if __name__ == "__main__":
     parser.add_argument('historic_data_fn', type=str, help='Path to the CSV file historic data (here ignored).')
     parser.add_argument('future_climatedata_fn', type=str, help='Path to the CSV file containing future climate data.')
     parser.add_argument('predictions_fn', type=str, help='Path to save the predictions CSV file.')
-
+    parser.add_argument('model_config', type=str, help='Model_configurations')
     args = parser.parse_args()
-    predict(args.model_fn, args.historic_data_fn, args.future_climatedata_fn, args.predictions_fn)
+    predict(args.model_fn, args.historic_data_fn, args.future_climatedata_fn, args.predictions_fn, args.model_config)

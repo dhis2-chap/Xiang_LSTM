@@ -13,3 +13,4 @@ dependencies:
   - numpy
   - joblib
   - scikit-learn
+  - PyYAML
