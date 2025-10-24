@@ -6,6 +6,7 @@ import joblib
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
+import json
 
 def fill_disease_data(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -39,6 +40,11 @@ def train(csv_fn, model_fn, model_config):
     locations = get_df_per_location(csv_fn)
     num_units = 1
     num_epochs = 1
+
+    with open(model_config, "r") as f:
+        content = f.read()
+    # Print it to the terminal
+    print(repr(content))
 
     for location, data in locations.items():
         data = fill_disease_data(data)
