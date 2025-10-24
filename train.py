@@ -74,7 +74,8 @@ if __name__ == "__main__":
 
     parser.add_argument('csv_fn', type=str, help='Path to the CSV file containing input data.')
     parser.add_argument('model_fn', type=str, help='Path to save the trained model.')
+    parser.add_argument('model_config', type=str, help='Model_configurations')
     args = parser.parse_args()
-    train(args.csv_fn, args.model_fn)
+    train(args.csv_fn, args.model_fn, args.model_config)
 
 

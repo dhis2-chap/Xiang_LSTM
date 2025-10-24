@@ -73,6 +73,6 @@ if __name__ == "__main__":
     parser.add_argument('historic_data_fn', type=str, help='Path to the CSV file historic data (here ignored).')
     parser.add_argument('future_climatedata_fn', type=str, help='Path to the CSV file containing future climate data.')
     parser.add_argument('predictions_fn', type=str, help='Path to save the predictions CSV file.')
-
+    parser.add_argument('model_config', type=str, help='Model_configurations')
     args = parser.parse_args()
-    predict(args.model_fn, args.historic_data_fn, args.future_climatedata_fn, args.predictions_fn)
+    predict(args.model_fn, args.historic_data_fn, args.future_climatedata_fn, args.predictions_fn, args.model_config)
