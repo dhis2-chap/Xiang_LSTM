@@ -6,6 +6,7 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
+import yaml
 
 
 def fill_disease_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -30,6 +31,12 @@ def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn, m
     locations_future = get_df_per_location(future_climatedata_fn)
     locations_historic = get_df_per_location(historic_data_fn)
 
+    with open(model_config, "r") as f:
+        config = yaml.safe_load(f)
+
+    user_options = config['user_option_values']
+    lookback_fraction = user_options["lookback_fraction"]
+
     first_location = True
 
 
@@ -42,7 +49,7 @@ def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn, m
         scaler = MinMaxScaler(feature_range=(0, 1))
         scaled_data = scaler.fit_transform(data['disease_cases'].values.reshape(-1, 1))
 
-        window_size = min(313, int(len(data) / 1.5))
+        window_size = int(len(data) * lookback_fraction)
         #print("Window_size: ", window_size)
 
         X = scaled_data[-window_size:].flatten()
